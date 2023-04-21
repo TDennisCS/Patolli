@@ -87,28 +87,34 @@ class Player
 class Referee
 {
     private:
+        // variables 
         array<Player,2> players;
         Board gameBoard;
         int scoreLimit;
         bool winner = false;
         bool changeTurn = true;
         bool forfeitTurn = false;
-        int round = 0;    
+        bool exitCondtion = false;
+        int roundCount = 0;    
         Movement currentMove;
-        char currentAction = '-'; 
+        char currentAction = '-';
+        int gameCount = 0; 
 
-        
+        // low level functions
 
     public: 
+        // High level functions
         Referee();
-        void NewTurn(); // resets all important conditions related to turns. 
-        void FirstTurn(int playerID);
+        int GameCounter(); //* gets the number of games played. 
+        void NewGame(); //* resets all variables to default
+        void NewTurn(); //* resets all important conditions related to turns. 
+        void FirstTurn(int playerID); //* First turn actions. 
         void NewPiece(int playerID);
         bool JudgeMove(Movement newMove);
         char GetSquareActions(Piece currentPiece);
         void RemovePiece(Piece removedPiece);
-        void AnotherTurn();
-        void NextRound();
+        void AnotherTurn(); 
+        void NextRound(); //* Increaments the round counter. 
         void ScoreEarned(Piece currentPiece);
         int GetScore(int playerID);
         bool CheckWin();
@@ -117,13 +123,15 @@ class Referee
         void ClearScreen();
         bool GetChangeTurn(); // get the change turn bool variable to know if the player gets another turn. 
         void SetChangeTurn(); // sets change turn to true at the beginning of the player turn.
-        int GetRound();
-        void RollDice(int playerID); // rolls the dice in the player obj and sets the player roll. 
+        int GetRound(); //* gets the round count variable. 
+        void RollDice(int playerID); //* rolls the dice in the player obj and sets the player roll. 
         int ShowRoll(int playerID); // shows the player roll
-        void PickPiece(int playerID); // prompts player to pick a piece on the board to roll. uses generate options to prompt player. 
+        void PickPiece(int playerID); //* prompts player to pick a piece on the board to roll. uses generate options to prompt player. 
         vector<Piece> GenerateOptions(int playerID); // generates options for the player based on roll and board state. 
         bool Forfeit(); // grabs forfeit bool variable. 
         void GameAction(int playerID); // rolling all possible actions into this method. 
         void CheckScoreboard(int playerID); // checks if player has reached 6 points. moditfies winner variable. 
+        void UserOptions(); // option to end the program or start a new game. 
+        bool Exit(); // grabs the exit condition for whether the new player wants a new game. 
 };
 
