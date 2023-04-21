@@ -12,7 +12,8 @@ struct Space
     char symbol; // char (“O” → starting position,”X” →ending postion,“R” → red square, ”C” → center square, ”_” → blank square)
     Piece ownership; // int (0  → empty, 1 → player1, 2 → player2)
     int locID; // 1-60
-}; 
+    void reset();
+};
 
 struct Square
 {
@@ -24,7 +25,7 @@ struct Piece
 {
     char symbol = ' '; // char (player 1 → A-F, player 2 → 1-6) ' '  == default
     int location = 0; // int (if on the board, 1-60, 0 == default)
-
+    void reset();
     
 };
 
@@ -32,7 +33,7 @@ struct Movement
 {
     Piece currentPiece;
     int newLocation = 0; // location the piece is moving to. 0 is default setting for newLocation; 
-    
+    void reset();
 };
 
 class Board
@@ -67,7 +68,7 @@ class Player
 
     public:
         Player(int playerID);
-        void ClearPieces(); 
+        void ResetPieces(); 
         void ClearScore();
         void NewPiece(char pieceSymbol);
         void MovePiece(Movement newMove);
@@ -90,14 +91,14 @@ class Referee
         // variables 
         array<Player,2> players;
         Board gameBoard;
-        int scoreLimit;
+        const int scoreLimit = 6;
         bool winner = false;
         bool changeTurn = true;
         bool forfeitTurn = false;
         bool exitCondtion = false;
         int roundCount = 0;    
         Movement currentMove;
-        char currentAction = '-';
+        char currentAction = ' ';
         int gameCount = 0; 
 
         // low level functions
