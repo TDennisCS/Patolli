@@ -10,7 +10,8 @@ using namespace std;
 struct Space
 {
     char symbol; // char (“O” → starting position,”X” →ending postion,“R” → red square, ”C” → center square, ”_” → blank square)
-    int ownership; // int (0  → empty, 1 → player1, 2 → player2)
+    Piece ownership; // int (0  → empty, 1 → player1, 2 → player2)
+    int locID; // 1-60
 }; 
 
 struct Square
@@ -21,15 +22,16 @@ struct Square
 
 struct Piece
 {
-    char symbol; // char (player 1 → A-F, player 2 → 1-6) 
-    int location; // int (if on the board, 0-59, else NULL)
+    char symbol = ' '; // char (player 1 → A-F, player 2 → 1-6) ' '  == default
+    int location = 0; // int (if on the board, 1-60, 0 == default)
+
     
 };
 
 struct Movement
 {
     Piece currentPiece;
-    int newLocation; 
+    int newLocation = 0; // location the piece is moving to. 0 is default setting for newLocation; 
     
 };
 
@@ -59,6 +61,8 @@ class Player
         int score;
         Square start; 
         Square end; 
+        int pID;
+        int roll;
 
 
     public:
@@ -67,13 +71,16 @@ class Player
         void ClearScore();
         void NewPiece(char pieceSymbol);
         void MovePiece(Movement newMove);
-        void RemovePiece(char pieceSymbol);
+        void ResetPiece(char pieceSymbol);
         void ShowPiece(char pieceSymbol);
         array<Piece,6> ShowPieces();
         void IncrementScore();
         int ShowScore();
         Square ShowStart();
         Square ShowEnd();
+        int GetID();
+        void Dice(); 
+        void GetRoll(); 
 
 };
 
@@ -85,27 +92,38 @@ class Referee
         int scoreLimit;
         bool winner = false;
         bool changeTurn = true;
+        bool forfeitTurn = false;
         int round = 0;    
+        Movement currentMove;
+        char currentAction = '-'; 
+
         
 
     public: 
         Referee();
+        void NewTurn(); // resets all important conditions related to turns. 
         void FirstTurn(int playerID);
         void NewPiece(int playerID);
         bool JudgeMove(Movement newMove);
-        char GetGameAction(Piece currentPiece);
+        char GetSquareActions(Piece currentPiece);
         void RemovePiece(Piece removedPiece);
         void AnotherTurn();
         void NextRound();
         void ScoreEarned(Piece currentPiece);
         int GetScore(int playerID);
-        void CheckWin(int playerID);
+        bool CheckWin();
         void NewGame();
         void Display();
         void ClearScreen();
-
-
-
-
-
+        bool GetChangeTurn(); // get the change turn bool variable to know if the player gets another turn. 
+        void SetChangeTurn(); // sets change turn to true at the beginning of the player turn.
+        int GetRound();
+        void RollDice(int playerID); // rolls the dice in the player obj and sets the player roll. 
+        int ShowRoll(int playerID); // shows the player roll
+        void PickPiece(int playerID); // prompts player to pick a piece on the board to roll. uses generate options to prompt player. 
+        vector<Piece> GenerateOptions(int playerID); // generates options for the player based on roll and board state. 
+        bool Forfeit(); // grabs forfeit bool variable. 
+        void GameAction(int playerID); // rolling all possible actions into this method. 
+        void CheckScoreboard(int playerID); // checks if player has reached 6 points. moditfies winner variable. 
 };
+

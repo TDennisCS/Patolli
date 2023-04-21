@@ -4,19 +4,39 @@
 
 int main()
 {
-    // Dice object 
-    default_random_engine generator;
-    uniform_int_distribution<int> distribution(1,6);
-    auto dice = bind( distribution, generator);
+    
+    Referee pat; // initalizeing the ref obj for patolli game
 
-    int roll = dice();
-
-    for (int i = 0; i < 10; i++)
+    do  // round loop that terminates when a player has won 
     {
-        cout << roll << endl;
-    }
- 
+        for (int i = 0; i < 2; i++) // turn loop for each player. 
+        {
+            
+            do // special condition if the piece lands on a red square and gets another turn. 
+            {
+                pat.NewTurn(); // resets all important conditions. 
+                
+                if (pat.GetRound() == 0) // only executes if the game is on the first round. round == 0.
+                {
+                    pat.FirstTurn(i); // each player gets the same action for the first turn of the game. 
+                }
 
+                // executes if the game has moved past the first round. round > 0.
+
+                pat.RollDice(i); // rolls the dice in the player obj and sets the player roll.
+                pat.PickPiece(i);
+                if (pat.Forfeit() == false) // checks if player decided to forfeit turn. if not then executes rest of tasks. 
+                {
+                    pat.GameAction(i);
+                }
+            } while (pat.GetChangeTurn() == false); // should always be turn at the start of the loop. 
+            
+            pat.CheckScoreboard(i)
+
+        }
+
+    }
+    while (pat.CheckWin() == false);
 
     return 0; 
 }
