@@ -21,23 +21,24 @@ do
             {   
                 if (pat.GetRound() != 0) //* grabs the round count variable. executes when not on first round. 
                 {
+                    // executes if the game has moved past the first round. round > 0.
                     pat.NewTurn(); //* resets all important conditions. 
                     
                     pat.RollDice(i); //* rolls the dice in the player obj and sets the player roll.
                     
                     pat.PickPiece(i); //* generates legal options for player then prompts for action. sets the current action option. 
                 
-                if (pat.Forfeit() == false) //* checks if player decided to forfeit turn. if not then executes rest of tasks. 
-                {
-                    pat.GameAction(i); //* does action based on current action variable. 
-                }   
+                    if (pat.Forfeit() == false) //* checks if player decided to forfeit turn. if not then executes rest of tasks. 
+                    {
+                        pat.GameAction(i); //* does action based on current action variable. 
+                    }   
                 }
                 else
                 {
                     pat.FirstTurn(i); //* each player gets the same action for the first turn of the game. 
                 }
 
-                // executes if the game has moved past the first round. round > 0.
+                
 
                
             } while (pat.GetChangeTurn() == false); //* should always be turn at the start of the loop. 
