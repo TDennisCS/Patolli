@@ -4,6 +4,7 @@
 #include<vector>
 #include<random> 
 #include<functional>
+#include<algorithm>
 
 using namespace std; 
 
@@ -71,10 +72,10 @@ class Player
         void ResetPieces(); 
         void ClearScore();
         void NewPiece(char pieceSymbol);
-        void MovePiece(Movement newMove);
+        void MovePiece(char pieceSymbol); // moves piece given using roll variable. 
         void ResetPiece(char pieceSymbol);
         void ShowPiece(char pieceSymbol);
-        array<Piece,6> ShowPieces();
+        array<Piece,6> GetPieces();
         void IncrementScore();
         int ShowScore();
         Square ShowStart();
@@ -112,6 +113,9 @@ class Referee
         void FirstTurn(int playerID); //* First turn actions. 
         void NewPiece(int playerID);
         bool JudgeMove(Movement newMove);
+        bool LegalMove(char pieceSymbol); 
+        void MovePiece(int playerID, char pieceSymbol); // moves the piece of the player given using the roll variable.
+        string GetPiecesString(int playerID); 
         char GetSquareActions(Piece currentPiece);
         void RemovePiece(Piece removedPiece);
         void AnotherTurn(); 
@@ -128,7 +132,7 @@ class Referee
         void RollDice(int playerID); //* rolls the dice in the player obj and sets the player roll. 
         int ShowRoll(int playerID); // shows the player roll
         void PickPiece(int playerID); //* prompts player to pick a piece on the board to roll. uses generate options to prompt player. 
-        vector<Piece> GenerateOptions(int playerID); // generates options for the player based on roll and board state. 
+        vector<char> GenerateOptions(int playerID); // generates options for the player based on roll and board state. 
         bool Forfeit(); // grabs forfeit bool variable. 
         void GameAction(int playerID); // rolling all possible actions into this method. 
         void CheckScoreboard(int playerID); // checks if player has reached 6 points. moditfies winner variable. 

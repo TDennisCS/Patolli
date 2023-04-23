@@ -57,7 +57,7 @@ void Player::Player::ShowPiece(char pieceSymbol) {
     
 }
 
-array<Piece,6> Player::Player::ShowPieces() {
+array<Piece,6> Player::Player::GetPieces() {
     
 }
 
@@ -81,8 +81,9 @@ int Player::Player::GetID() {
     
 }
 
-void Player::Player::Dice() {
-    
+void Player::Player::Dice() 
+{
+    // rolls a dice and sets the roll variable.     
 }
 
 void Player::Player::GetRoll() {
@@ -150,9 +151,121 @@ void Referee::RollDice(int playerID)
 {
 
     //* rolls the dice in the player obj and sets the player roll.
-    
+    players[playerID].Dice();
+
+
+
 }
 
+void Referee::PickPiece(int playerID)
+{
+    //* generates legal options for player then prompts for action. sets the current action option.
+
+    char answer;   // user input 
+    bool promptCondition = true; // keeps asking the user for a valid piece to move. 
+
+
+    vector<char> options = GenerateOptions(playerID); // options aviable for the player; 
+
+    bool optionCondition = !(options.empty());
+
+    // portions of the prompt.
+    string message1 = "Player ";
+    string message2 = ", Please Input piece to move [";
+    string message3 = "]: or Forfiet turn [0]";
+
+    // converts option vector into string.  
+    
+    string optionString = ""; // initalizes an empty string 
+    if (optionCondition == true) // checks if options are empty. if not then fills options string. 
+    {
+        for (auto i : options) 
+        {
+            optionString = optionString + " " + i;
+        }
+    }
+    else // if it is then gives a altnerate option string. 
+    {
+        optionString = "No Piecees Available"; 
+    }
+
+
+
+
+    // concatenate all the portions into a prompt. 
+    string prompt = message1 + to_string(playerID) + message2 + optionString + message3; 
+
+    // loops till it gets a vaild input. 
+    if (optionCondition == true)
+    {
+        do 
+        {
+            cout << prompt; // displays prompt message
+            cin >> answer; // inputs respone into answer variable. 
+            answer = toupper(answer); // converts input into uppercase
+            if (find(options.begin(), options.end(),answer) !=options.end())
+            {
+                promptCondition == false;
+            }
+            if (answer == '0')
+            {
+                promptCondition == false; 
+            }
+
+        } while (promptCondition == true);
+    }
+    else
+    {
+        do 
+        {
+            cout << prompt; // displays prompt message
+            cin >> answer; // inputs respone into answer variable. 
+            if (answer == '0')
+            {
+                promptCondition == false;
+            }
+
+        } while (promptCondition == true);
+    }
+
+
+    if(answer == '0') // if the player choose "0' than it updates forfeit condition. 
+    {
+        forfeitTurn = true;
+    }
+    else // if the player choose a piece then calls movepiece to update piece slected. 
+    {
+        MovePiece(playerID, answer); // moves the piece of the player given using the roll variable. 
+
+    }
+}
+
+string Referee::GetPiecesString(int playerID)
+{
+    // gets the piece symbols for the player into a char array. 
+ 
+    array<Piece,6> pieceList = players[playerID].GetPieces();
+    array<char,6> pieceID;
+    string playerPieceList = "";
+    for (int i = 0; i < 6; i++)
+    {
+        pieceID[i] = pieceList[i].symbol;
+    }
+
+    for (int i = 0; i < 6; i++)
+    {
+        playerPieceList = playerPieceList + pieceID[i] +  ", " ;
+    }
+
+    return playerPieceList;
+}
+
+
+
+void Referee::MovePiece(int playerID, char pieceSymbol)
+{
+    players[playerID].MovePiece(pieceSymbol);
+}
 
 void Referee::NewPiece(int playerID) {
     
