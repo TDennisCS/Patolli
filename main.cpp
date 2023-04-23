@@ -5,9 +5,12 @@
 int main()
 {
     
+
     Referee pat; // initalizeing the ref obj for patolli game
 do 
-{
+{ 
+    srand(time(0)); // time seed for Roll dice member function. 
+
     if (pat.GameCounter() != 0) //* grabs the game count variable.  only executes when higher than 0. meaning new game. 
     {
         pat.NewGame(); //* resets all variables 
@@ -24,7 +27,8 @@ do
                     // executes if the game has moved past the first round. round > 0.
                     pat.NewTurn(); //* resets all important conditions. 
                     
-                    pat.RollDice(i); //* rolls the dice in the player obj and sets the player roll.
+                    pat.RollDice(i); //* rolls a 6 sided dice then updates the roll variable.  
+    
                     
                     pat.PickPiece(i); //* generates legal options for player then prompts for action. sets the current action option. 
                 
