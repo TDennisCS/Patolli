@@ -175,7 +175,7 @@ array<Space,60> Board::GetBoard()
     return spaces;    
 }
 
-Player::Player(int playerID); 
+Player::Player(int playerID)
 {
     pID = playerID + 1; 
     array<char,6> p1Symbols = {'A','B','C','D','E','F'};
@@ -191,13 +191,30 @@ Player::Player(int playerID);
             pieces[i].symbol = p2Symbols[i];
         }
     }
+
+    if(pID == 1)
+        {
+            start.symbol = 'o';
+            start.location = 1;
+            end.symbol = 'x';
+            end.location = 59;
+        }
+        else
+        {
+            start.symbol = 'o';
+            start.location = 31;
+            end.symbol = 'x';
+            end.location = 29;
+        }
+    
+    score = 0; 
 }
 
 void Player::Player::ResetPieces() 
 {
    for (int i = 0; i< 6; i++)
     {
-        pieces[i].Reset();
+        pieces[i].location = 0;
     }    
 }
 
@@ -292,6 +309,13 @@ int Player::Player::GetID()
 Referee::Referee() 
 {
     //constructor 
+    Player p1(0);
+    Player p2(1);
+
+    players[0] = p1;
+    players[1] = p2; 
+
+    NewGame();
 }
 
 int Referee::GameCounter() 
@@ -587,39 +611,170 @@ bool Referee::JudgeMove(Movement newMove)
     return judgement; 
 }
 
-char Referee::GetSquareActions(Piece currentPiece) 
+void Referee::GameAction(int playerID)
 {
+    char action = GetSquareActions();
+
+    int newLocIndex = currentMove.newLocation;
+    int oldLocIndex = currentMove.currentPiece.location;
     
+    Space newLoc = gameBoard.GetSpace(newLocIndex);
+    Space oldLoc = gameBoard.GetSpace(oldLocIndex); 
+    
+    Piece currentPiece = currentMove.currentPiece;
+
+    if (action == 'r')
+    {
+        AnotherTurn();
+        gameBoard.ResetSpace(oldLocIndex);
+    }
+    else if (action == 'c')
+    {
+        gameBoard.ResetSpace(oldLocIndex);
+    }
 }
 
-void Referee::RemovePiece(Piece removedPiece) {
-    
+char Referee::GetSquareActions() 
+{
+    char action;
+    int newLocIndex = currentMove.newLocation;
+    Space newLoc = gameBoard.GetSpace(newLocIndex);
+    action = newLoc.type.symbol;
+    return action;
 }
 
-void Referee::AnotherTurn() {
-    
+void Referee::RemovePiece(Piece removedPiece) 
+{
+    array<Piece,6> pieceList; 
+    for (int i = 0; i < 6; i++)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            pieceList = players[j].GetPieces();
+            if (pieceList[i].symbol == removedPiece.symbol)
+            {
+                players[j].ResetPiece(pieceList[i].symbol);
+            }
+        }
+    }
 }
 
-void Referee::ScoreEarned(Piece currentPiece) {
-    
+void Referee::AnotherTurn() 
+{
+    changeTurn = false;
 }
 
-int Referee::GetScore(int playerID) {
-    
+void Referee::ScoreEarned(Piece currentPiece) 
+{
+    RemovePiece(currentPiece);
+    int pid = currentRoll.pID;
+    players[pid].IncrementScore();
 }
 
-bool Referee::CheckWin() {
-    
+int Referee::GetScore(int playerID) 
+{
+    players[playerID].ShowScore();
 }
 
-void Referee::Display() {
-    
+bool Referee::CheckWin() 
+{
+    bool win = false;
+    for (int i = 0; i < 2; i++)
+    {
+        if (GetScore(i) == scoreLimit)
+        {
+            win = true;
+        }    
+    }
+    return win; 
 }
 
-void Referee::ClearScreen() {
-    
+void Referee::Display() 
+{
+    array<array<char,16>,16> displayBoard;
+    array<Space,60> boardArr = gameBoard.GetBoard(); 
+    int index = 22; 
+    for (int i = 0; i < 16; i++)
+    {   
+
+        if (i < 7)
+        {
+            for(int j = 0; j < 16; i++)
+            {
+                if ( j == 7 || j == 8)
+                {
+                    for (int k = 0; k < 2; k++)
+                    {
+                        displayBoard[i][j] = boardArr[index+k].ownership.symbol;
+                    }
+                      
+                }
+                else 
+                {
+                    displayBoard[i][j] = 'X';
+                }
+               
+            }  
+            index = index - (2*(i+1));
+        }
+        else if (i >= 7 || i < 9)
+        {
+            for (int j = 0; j < 16; i++)
+            {
+                if (i == 7 && j > 8)
+                {
+                    displayBoard[i][j] = boardArr[index + j].ownership.symbol;
+                }
+                else if (i == 7 && j > 8)
+                {
+                     displayBoard[i][j] = boardArr[index -j].ownership.symbol; 
+                }
+                else if (i == 7 && j > 8)
+                {
+                     displayBoard[i][j] = boardArr[index + j].ownership.symbol;
+                }
+                else if (i == 7 && j > 8)
+                {
+                     displayBoard[i][j] = boardArr[index - j].ownership.symbol;
+                }
+            }
+           
+        }
+        else if (i > 8)
+        {
+            for(int j = 0; j < 16; i++)
+            {
+                if ( j == 7 || j == 8)
+                {
+                    for (int k = 0; k < 2; k++)
+                    {
+                        displayBoard[i][j] = boardArr[index+k].ownership.symbol;
+                    }
+                      
+                }
+                else 
+                {
+                    displayBoard[i][j] = 'X';
+                }
+               
+            }  
+            index = index - (2*(i+1));
+        }
+    }
+
+    for (int i =0; i < 16; i++)
+    {
+        for (int j = 0; j < 16; j++)
+        {
+            cout << displayBoard[i][j];
+        }
+    }
 }
 
-int Referee::ShowRoll(int playerID) {
-    
+void Referee::ClearScreen() 
+{
+    system("CLS");
 }
+
+
+

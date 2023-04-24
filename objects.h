@@ -128,7 +128,7 @@ class Referee
         bool LegalMove(char pieceSymbol); 
         void MovePiece(int playerID); //** moves the piece of the player given using currentMove variable. 
         string GetPiecesString(int playerID); 
-        char GetSquareActions(Piece currentPiece);
+        char GetSquareActions();
         void RemovePiece(Piece removedPiece);
         void AnotherTurn(); 
         void NextRound(); //* Increaments the round counter. 
@@ -142,7 +142,6 @@ class Referee
         void SetChangeTurn(); // sets change turn to true at the beginning of the player turn.
         int GetRound(); //* gets the round count variable. 
         void RollDice(int playerID); //* rolls the dice in the player obj and sets the player roll. 
-        int ShowRoll(int playerID); // shows the player roll
         void PickPiece(int playerID); //* prompts player to pick a piece on the board to roll. uses generate options to prompt player. 
         vector<Movement> GenerateOptions(int playerID); //** generates options for the player based on roll and board state. 
         bool Forfeit(); // grabs forfeit bool variable. 
