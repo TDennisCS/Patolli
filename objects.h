@@ -11,56 +11,58 @@ using namespace std;
 
 struct Space
 {
-    char symbol; // char (“O” → starting position,”X” →ending postion,“R” → red square, ”C” → center square, ”_” → blank square)
+    Square type; // char (“O” → starting position,”X” →ending postion,“R” → red square, ”C” → center square, ”_” → blank square)
     Piece ownership; // int (0  → empty, 1 → player1, 2 → player2)
-    int locID; // 1-60
-    void reset();
+    void Reset();
+    bool Occupied(); // checks if space is unoccupied.
+    bool Center(); // checks if space is a center square. 
+    bool Red(); // checks if space is a red square. 
 };
 
 struct Square
 {
     char symbol = ' '; // char (“O” → starting position,”X” →ending postion,“R” → red square, ”C” → center square, ' ' --> for blank)
     int location = 0; // int (1-60)
-    void reset();
+    void Reset();
 };
 
 struct Piece
 {
     char symbol = ' '; // char (player 1 → A-F, player 2 → 1-6) ' '  == default
     int location = 0; // int (if on the board, 1-60, 0 == default)
-    bool safe = true;  // is this piece in the center of the board. true for no.  false for yes. 
-    void reset();
-    
+      // is this piece in the center of the board. true for no.  false for yes. 
+    void Reset();
+    bool Blank(); 
 };
 
 struct Roll 
 {
     int value = 0; //dice value. range (1-6), default(0) 
     int pID = 0; // player owns this roll. range (1-2) , default(0)
-    void reset();
+    void Reset();
 }; 
 
 struct Movement
 {
     Piece currentPiece;
     int newLocation = 0; // location the piece is moving to. 0 is default setting for newLocation; 
-    void reset();
+    void Reset();
 };
 
 class Board
 {
     private:
-        array<Space,60> spaces;  // board array  
-        array<Square,16> squares; // red squares('r')(0-7), center squares('c')(8-11), start ('o')(12 -13), end ('x')(14-15) 
-    
+        array<Space,60> spaces;  // board array    
+        array<Square,8> reds;
+        array<Square,4> centers;
     public:
         Board(); // constructor
         void Clear(); // clears board
-        void Place(int playerID); // places new piece on the board 
-       void Remove(char pieceSymbol); // removes piece from the board
-        void Move(Movement newMove); // moves piece on board 
-        array<Space,60> ShowBoard(); // returns a copy of the board array
-        array<Square,16> ShowSquares(); // returns a copy of the squares array
+        array<Space,60> GetBoard(); // returns a copy of the board array
+        // returns a copy of the squares array
+        Space GetSpace(int spaceIndex); // grabs the space at this index on the board array
+        void SetSpace(int spaceIndex); // sets the space at this index on the board array
+        void ResetSpace(int spaceIndex); // resets the space at this index to it's default state. 
 
 
 

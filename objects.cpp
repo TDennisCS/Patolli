@@ -1,43 +1,203 @@
 #include "objects.h"
 
+void Space::Reset()
+{
+    type.Reset();
+    ownership.Reset();
 
-Board::Board() {
-    
 }
 
-void Board::Clear() {
+bool Space::Occupied()
+{
+    bool occupyCondition; 
     
+    if (ownership.Blank())
+    {
+        occupyCondition = false;
+    }
+    else
+    {
+        occupyCondition = true; 
+    }
+    return occupyCondition;
 }
 
-void Board::Place(int playerID) {
+bool Space::Center()
+{
+    bool CenterCondition; 
     
+    if (type.symbol =='c')
+    {
+        CenterCondition = true;
+    }
+    else
+    {
+        CenterCondition = false; 
+    }
+
+    return CenterCondition;
 }
 
-void Board::Remove(char pieceSymbol) {
+bool Space::Red()
+{
+    bool RedCondition; 
     
+    if (type.symbol =='r')
+    {
+        RedCondition = true;
+    }
+    else
+    {
+        RedCondition = false; 
+    }
+
+    return RedCondition;
 }
 
-void Board::Move(Movement newMove) {
-    
+void Square::Reset()
+{
+    symbol = ' ';
+    location = 0; 
 }
 
-array<Space,60> Board::ShowBoard() {
-    
+void Piece::Reset()
+{
+    symbol = ' ';
+    location = 0; 
 }
 
-array<Square,16> Board::ShowSquares() {
-    
+bool Piece::Blank()
+{
+    bool blankdConditon;
+    bool defaultSymbolCondition; 
+    bool defaultLocationCondition;
+    char defaultSymbol = ' ';
+    int defaultLocation = 0;
+    if (symbol == defaultSymbol)
+    {
+        defaultSymbolCondition = true;
+    }
+    else 
+    {
+        defaultSymbolCondition = false;
+    }
+
+    if (location == defaultLocation)
+    {
+        defaultLocationCondition = true;
+    }
+    else 
+    {
+        defaultLocationCondition = false;
+    }
+
+    // Boolean Algebra  C = A and B 
+    blankdConditon = defaultSymbolCondition*defaultLocationCondition; 
+
+    return blankdConditon; 
 }
 
-Player::Player::Player(int playerID) {
+void Roll::Reset()
+{
+    value = 0;
+    pID = 0; 
+}
+
+void Movement::Reset()
+{
+    currentPiece.Reset();
+    newLocation = 0; 
+}
+
+Board::Board() 
+{
+    array<int, 8> redLocs = {7,8,22,23,37,38,52,53};
+    array<Square,8> redSquares;
+    for (int r = 0; r < 8;  r++)
+    {
+        redSquares[r].symbol = 'r';
+        redSquares[r].location = redLocs[r];
+    }
+
+    array<int, 4> centerLocs = {15,30,45,60};
+    array<Square,4> centerSquares;
+    for (int c = 0; c < 4;  c++)
+    {
+        centerSquares[c].symbol = 'c';
+        centerSquares[c].location = redLocs[c];
+    }
     
+    centers = centerSquares;
+    reds = redSquares;
+
+    
+
+    int loc = 1; 
+    for (int i = 0; i < 60; i++)
+    {
+        loc = loc + i;
+        spaces[i].type.location = loc;
+        spaces[i].type.symbol = ' ';
+        spaces[i].ownership.Reset();
+    }
+
+    for(auto red: reds)
+    {
+        for (int i = 0; i < 60; i++)
+        {
+            if (spaces[i].type.location == red.location)
+            {
+                spaces[i].type = red; 
+            }
+        }
+    }
+    
+    for(auto center: centers)
+    {
+        for (int i = 0; i < 60; i++)
+        {
+            if (spaces[i].type.location == center.location)
+            {
+                spaces[i].type = center; 
+            }
+        }
+    }
+}
+void Board::Clear() 
+{
+    for(int i = 0; i < 60; i++)
+    {
+        spaces[i].ownership.Reset();
+    }    
+}
+array<Space,60> Board::GetBoard() 
+{
+    return spaces;    
+}
+
+Player::Player(int playerID); 
+{
+    pID = playerID + 1; 
+    array<char,6> p1Symbols = {'A','B','C','D','E','F'};
+    array<char,6> p2Symbols = {'1','2','3','4','5','6'};
+    for(int i = 0; i < 6; i++)
+    {
+        if(pID == 1)
+        {
+            pieces[i].symbol = p1Symbols[i];
+        }
+        else
+        {
+            pieces[i].symbol = p2Symbols[i];
+        }
+    }
 }
 
 void Player::Player::ResetPieces() 
 {
    for (int i = 0; i< 6; i++)
     {
-        pieces[i].reset();
+        pieces[i].Reset();
     }    
 }
 
@@ -77,7 +237,7 @@ void Player::Player::ResetPiece(char pieceSymbol)
     {
         if(pieces[i].symbol == pieceSymbol)
         {
-            pieces[i].reset();
+            pieces[i].Reset();
         }
     }
      
@@ -161,11 +321,11 @@ void Referee::NewGame()
 
         roundCount = 0;    
         
-        currentMove.reset();
+        currentMove.Reset();
 
-        currentAction.reset();
+        currentAction.Reset();
 
-        currentRoll.reset();
+        currentRoll.Reset();
 
         gameCount++; 
 }
@@ -185,9 +345,9 @@ void Referee::NewTurn()
                     
     changeTurn = true; 
     forfeitTurn = false;
-    currentMove.reset();
-    currentAction.reset();
-    currentRoll.reset();
+    currentMove.Reset();
+    currentAction.Reset();
+    currentRoll.Reset();
 
 }
 void Referee::RollDice(int playerID) 
@@ -375,19 +535,20 @@ vector<Movement> Referee::GenerateOptions(int playerID)
     {
         for(auto i: piecelist)
         {
-           
-            move.currentPiece = i; 
-            move.newLocation = i.location + roll; 
-            if (move.newLocation > 60) // accounts for a looping situation to see if on the loop around the piece would be blocked. 
-            {
-                move.newLocation - 60;
-            }
-            legal = JudgeMove(move); // checks if a movement is legal. 
-            if (legal == true)
-            {
+           if (i.location != 0)
+           {
+                move.currentPiece = i; 
+                move.newLocation = i.location + roll; 
+                if (move.newLocation > 60) // accounts for a looping situation to see if on the loop around the piece would be blocked. 
+                {
+                    move.newLocation - 60;
+                }
+                legal = JudgeMove(move); // checks if a movement is legal. 
+                if (legal == true)
+                {
                     options.push_back(move);
-            }
-            
+                }
+           }            
         }
     }
 
@@ -412,10 +573,22 @@ void Referee::NewPiece(int playerID)
 
 bool Referee::JudgeMove(Movement newMove) 
 {
+    // checks if a move is legal 
+    // bool variable 
+    Space loc = gameBoard.GetSpace(newMove.newLocation); // location on the board being judged.
+    bool judgement; // returned value; 
+    bool OccupiedConditon = loc.Occupied(); // is this space empty; checks if space  has an owner. 
+    bool centerCondtion = loc.Center(); // is this square a center square; checks if space symbol is 'c'
     
+    //Boolean Algebra  C =  !A U B
+    judgement = !(OccupiedConditon) + centerCondtion; // or statement 
+    // really proud of this \(0.0)/ 
+    
+    return judgement; 
 }
 
-char Referee::GetSquareActions(Piece currentPiece) {
+char Referee::GetSquareActions(Piece currentPiece) 
+{
     
 }
 
